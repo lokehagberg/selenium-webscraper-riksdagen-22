@@ -6,23 +6,33 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-riksled_mail = []
+number_list = []
 
 driver = webdriver.Chrome(ChromeDriverManager().install())
 driver.maximize_window()
 
 #s=Service(path)
 #driver=webdriver.Chrome(service=s)
-driver.get('https://www.riksdagen.se/sv/ledamoter-partier/')
+driver.get('https://www.hitta.se/s%C3%B6k?vad=v%C3%A4sterort%20stockholms%20l%C3%A4n')
 
-for i in range(349):
-    riksled = driver.find_elements(By.CLASS_NAME, 'fellow-item-container')
-    riksled[i].click()
-    element = WebDriverWait(driver,10).until(
-        EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'riksdagen.se')]"))
+cook = WebDriverWait(driver,10).until(
+    EC.presence_of_element_located((By.XPATH, "//p[contains(text(), 'Jag godkänner')]"))
+)
+
+cook.click()
+
+next_exists = len(driver.find_elements(By.XPATH, "//a/span[contains(text(), 'Nästa')]"))
+
+while next_exists >= 1:
+    lnth = len(driver.find_elements(By.XPATH, "//span[contains(text(), 'Visa') and contains(text(), '07')]"))
+    for i in range(lnth):
+        element = WebDriverWait(driver,20).until(
+            EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Visa') and contains(text(), '07')]"))
+        )
+        number_list.append(element.text)
+    next = WebDriverWait(driver,20).until(
+        EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'Nästa')]"))
     )
-    riksled_mail.append(element.text)
-    driver.back()
-
-print(",".join(riksled_mail))
+    next.click()
+print(",".join(number_list))
 	
